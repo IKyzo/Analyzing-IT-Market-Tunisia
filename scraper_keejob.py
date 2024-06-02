@@ -33,38 +33,41 @@ def scrape_page(url):
             # Iterating through elements
             for job in job_elements:
                 job_title_element = job.find('a', {'style': 'color: #005593;'})
-                job_description_element = job.find('p',{'style': 'margin-bottom:3px'})
-                company_name_element = job.find('a', href=lambda value: value and value.startswith('/offres-emploi/companies/'))
-                #company_name_element = company_name.find('b').get_text(strip=True) if company_name and company_name.find('b') else None
-                job_location_element = job.find('i', class_='fa fa-map-marker').find_next(string=True, strip=True)
+                job_description_element = job.find('p', {'style': 'margin-bottom:3px'})
+                company_name_element = job.find('div', class_='span12 no-margin-left').find('a', href=lambda value: value and value.startswith('/offres-emploi/companies/'))
+                job_location_element = job.find('i', class_='fa fa-map-marker')
 
-                print("Job Title:", job_title_element.text if job_title_element else "Title not found")
-                print("Description:", job_description_element.text if job_description_element else "Description not found")
-                # Debug prints for company name and location
-                print("Company Name Element:", company_name_element)
+                # Debug: Print the company name element HTML
+                print("Company Name Element HTML:", company_name_element)
+
+                # Extract and print job title
+                job_title = job_title_element.text.strip() if job_title_element else "Title not found"
+                print("Job Title:", job_title)
+
+                # Extract and print job description
+                job_description = job_description_element.text.strip() if job_description_element else "Description not found"
+                print("Description:", job_description)
+
+                # Extract and print company name
                 if company_name_element:
-                # Check if the company name is within a <b> tag
-                    company_name_bold = company_name_element.find('b')
-                    if company_name_bold:
-                        print("Company Name Text (Bold):", company_name_bold.get_text(strip=True))
-                    else:
-                        print("Company Name Text:", company_name_element.get_text(strip=True))
+                    company_name_b_element = company_name_element.find('b')
+                    company_name = company_name_b_element.text.strip() if company_name_b_element else company_name_element.text.strip()
+                else:
+                    company_name = "Company not found"
+                print("Company Name:", company_name)
 
-                print("Job Location Element:", job_location_element)
-    
-                # Debug print for job location text
-                if job_location_element:
-                    print("Job Location Text:", job_location_element.text.strip())
-
+                # Extract and print job location
+                job_location = job_location_element.next_sibling.strip() if job_location_element and job_location_element.next_sibling else "Location not found"
+                print("Job Location:", job_location)
 
                 # Determine the tag (featured or available)
                 tag = "featured" if job in job_elements_featured else "available"
 
-                # Extract data and append to lists
-                job_titles.append(job_title_element.text if job_title_element else "Title not found")
-                job_descriptions.append(job_description_element.text if job_description_element else "Description not found")
-                company_names.append(company_name_element.text if company_name_element else "Company not found")
-                job_locations.append(job_location_element.text if job_location_element else "Location not found")
+                # Append data to lists
+                job_titles.append(job_title)
+                job_descriptions.append(job_description)
+                company_names.append(company_name)
+                job_locations.append(job_location)
                 tags.append(tag)
 
             # Create a DataFrame
