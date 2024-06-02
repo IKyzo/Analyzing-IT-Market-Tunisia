@@ -12,12 +12,8 @@ def scrape_page(url):
         # Parse the HTML content of the page
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Selectors for both featured and regular jobs
-        job_elements_featured = soup.find_all('article', class_='media well listing-item listing-item__jobs listing-item__featured')
-        job_elements_regular = soup.find_all('article', class_='media well listing-item listing-item__jobs listing-item__no-logo')
-
-        # Combine both types of job elements
-        job_elements = job_elements_featured + job_elements_regular
+        # Select job elements
+        job_elements = soup.find_all('article', class_='media well listing-item listing-item__jobs')
 
         # Check if any job elements were found
         if job_elements:
@@ -28,27 +24,32 @@ def scrape_page(url):
             job_descriptions = []
             company_names = []
             job_locations = []
-            tags = []  # New column for tags
+            job_posted_dates = []
 
             # Iterating through elements
             for job in job_elements:
+                # Extract job title
                 job_title_element = job.find('div', class_="media-heading listing-item__title")
+                job_titles.append(job_title_element.text.strip() if job_title_element else "Title not found")
+
+                # Extract job description
                 job_description_element = job.find('div', class_='listing-item__desc hidden-sm hidden-xs')
+                job_descriptions.append(job_description_element.text.strip() if job_description_element else "Description not found")
+
+                # Extract company name
                 company_name_element = job.find('span', class_='listing-item__info--item listing-item__info--item-company')
+                company_names.append(company_name_element.text.strip() if company_name_element else "Company not found")
+
+                # Extract job location
                 job_location_element = job.find('span', class_='listing-item__info--item listing-item__info--item-location')
+                job_locations.append(job_location_element.text.strip() if job_location_element else "Location not found")
 
-                # Determine the tag (featured or available)
-                tag = "featured" if job in job_elements_featured else "available"
-
-                # Extract data and append to lists
-                job_titles.append(job_title_element.text if job_title_element else "Title not found")
-                job_descriptions.append(job_description_element.text if job_description_element else "Description not found")
-                company_names.append(company_name_element.text if company_name_element else "Company not found")
-                job_locations.append(job_location_element.text if job_location_element else "Location not found")
-                tags.append(tag)
+                # Extract job posted date
+                job_posted_date_element = job.find('div', class_='listing-item__date')
+                job_posted_dates.append(job_posted_date_element.text.strip() if job_posted_date_element else "Date not found")
 
             # Create a DataFrame
-            data = {'Job Title': job_titles, 'Description': job_descriptions, 'Company': company_names, 'Location': job_locations, 'Tags': tags}
+            data = {'Job Title': job_titles, 'Description': job_descriptions, 'Company': company_names, 'Location': job_locations, 'Posted Date': job_posted_dates}
             df = pd.DataFrame(data)
 
             return df
@@ -65,7 +66,7 @@ base_url = "https://www.tanitjobs.com/cities/jobs-in-sousse/?searchId=1702040306
 
 # Set the range of pages you want to scrape
 start_page = 1
-end_page = 10  # Change this to the desired end page
+end_page = 3  # Change this to the desired end page
 
 # Initialize an empty DataFrame to store the results
 final_df = pd.DataFrame()
