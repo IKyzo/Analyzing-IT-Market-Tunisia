@@ -28,6 +28,7 @@ def scrape_page(url):
             job_descriptions = []
             company_names = []
             job_locations = []
+            job_posted_dates = []  # New list for job posted dates
             tags = []  # New column for tags
 
             # Iterating through elements
@@ -36,9 +37,7 @@ def scrape_page(url):
                 job_description_element = job.find('p', {'style': 'margin-bottom:3px'})
                 company_name_element = job.find('div', class_='span12 no-margin-left').find('a', href=lambda value: value and value.startswith('/offres-emploi/companies/'))
                 job_location_element = job.find('i', class_='fa fa-map-marker')
-
-                # Debug: Print the company name element HTML
-                print("Company Name Element HTML:", company_name_element)
+                job_posted_date_element = job.find('i', class_='fa fa-clock-o')
 
                 # Extract and print job title
                 job_title = job_title_element.text.strip() if job_title_element else "Title not found"
@@ -60,6 +59,10 @@ def scrape_page(url):
                 job_location = job_location_element.next_sibling.strip() if job_location_element and job_location_element.next_sibling else "Location not found"
                 print("Job Location:", job_location)
 
+                # Extract and print job posted date if available
+                job_posted_date = job_posted_date_element.find_parent('span').text.strip() if job_posted_date_element else "Date not found"
+                print("Job Posted Date:", job_posted_date)
+
                 # Determine the tag (featured or available)
                 tag = "featured" if job in job_elements_featured else "available"
 
@@ -68,10 +71,11 @@ def scrape_page(url):
                 job_descriptions.append(job_description)
                 company_names.append(company_name)
                 job_locations.append(job_location)
+                job_posted_dates.append(job_posted_date)
                 tags.append(tag)
 
             # Create a DataFrame
-            data = {'Job Title': job_titles, 'Description': job_descriptions, 'Company': company_names, 'Location': job_locations, 'Tags': tags}
+            data = {'Job Title': job_titles, 'Description': job_descriptions, 'Company': company_names, 'Location': job_locations, 'Posted Date': job_posted_dates, 'Tags': tags}
             df = pd.DataFrame(data)
 
             return df
