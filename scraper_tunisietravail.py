@@ -54,23 +54,35 @@ def scrape_page(url):
         print(f"Failed to retrieve the page {url}. Status Code: {response.status_code}")
         return None
 
-# Function to scrape job detail page for location information
+# Function to scrape job detail page for location and company information
 def scrape_job_detail_page(detail_url):
     response = requests.get(detail_url)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Find the location information based on the provided structure
-        location_element = soup.find('div', class_='BoxSideContentP')
-        if location_element:
-            location_text = location_element.find_all('div')[-1].text.strip()
-            return location_text
-        else:
-            return "Location not found"
+        # Find the first `CententSingleCadre` div
+        content_div = soup.find('div', class_='CententSingleCadre')
+        location = "Location not found"
+        company_name = "Company not found"
+        
+        if content_div:
+            paragraphs = content_div.find_all('p')
+            for p in paragraphs:
+                if "Ville" in p.text:
+                    strong_tags = p.find_all('strong')
+                    if len(strong_tags) >= 2:
+                        location = strong_tags[0].text.strip()
+                        company_name = strong_tags[1].text.strip()
+                    break
+        
+        # Debug output to check the extraction
+        print(f"Debug: URL={detail_url}, Location={location}, Company={company_name}")
+        
+        return location, company_name
     else:
         print(f"Failed to retrieve the page {detail_url}. Status Code: {response.status_code}")
-        return "Location not found"
+        return "Location not found", "Company not found"
 
 
 # Main code to iterate through pages
@@ -88,8 +100,8 @@ for page_number in range(start_page, end_page + 1):
     page_df = scrape_page(page_url)
 
     if page_df is not None:
-        # Scrape job detail page for location information
-        page_df['Location'] = page_df['Detail URL'].apply(scrape_job_detail_page)
+        # Scrape job detail page for location and company information
+        page_df[['Location', 'Company']] = page_df['Detail URL'].apply(lambda url: pd.Series(scrape_job_detail_page(url)))
         final_df = pd.concat([final_df, page_df], ignore_index=True)
 
 # Display the final DataFrame
