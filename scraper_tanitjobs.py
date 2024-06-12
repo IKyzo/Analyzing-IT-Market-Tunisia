@@ -1,11 +1,21 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
+import time 
 
+
+# # Set the path to the CA bundle
+# ca_bundle_path = r'C:\Users\wajdk\AppData\Local\Programs\Python\Python312\Lib\site-packages\certifi\cacert.pem'
+
+# # Set the REQUESTS_CA_BUNDLE environment variable
+# os.environ['REQUESTS_CA_BUNDLE'] = ca_bundle_path
 # Function to scrape data from a specific page
 def scrape_page(url):
-    response = requests.get(url)
+    # Specify the path to the CA bundle
+
+    response = requests.get(url, verify=False)
 
     # Request was successful code: 200
     if response.status_code == 200:
@@ -62,11 +72,11 @@ def scrape_page(url):
         return None
 
 # Main code to iterate through pages
-base_url = "https://www.tanitjobs.com/cities/jobs-in-sousse/?searchId=1702040306.949&action=search&page="
+base_url = "https://www.tanitjobs.com/jobs/?searchId=1718202132.3573&action=search&page="
 
 # Set the range of pages you want to scrape
 start_page = 1
-end_page = 3  # Change this to the desired end page
+end_page = 20  # Change this to the desired end page
 
 # Initialize an empty DataFrame to store the results
 final_df = pd.DataFrame()
@@ -77,7 +87,7 @@ for page_number in range(start_page, end_page + 1):
 
     if page_df is not None:
         final_df = pd.concat([final_df, page_df], ignore_index=True)
-
+    time.sleep(5)
 # Display the final DataFrame
 print(final_df)
 

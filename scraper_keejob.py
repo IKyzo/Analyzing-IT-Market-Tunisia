@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
+import time
 
 def scrape_page(url):
     response = requests.get(url)
@@ -82,7 +83,7 @@ base_url = "https://www.keejob.com/offres-emploi/?keywords=sousse&page="
 
 # Set the range of pages you want to scrape
 start_page = 1
-end_page = 3  # Change this to the desired end page
+end_page = 7  # Change this to the desired end page
 
 # Initialize an empty DataFrame to store the results
 final_df = pd.DataFrame()
@@ -93,7 +94,7 @@ for page_number in range(start_page, end_page + 1):
 
     if page_df is not None:
         final_df = pd.concat([final_df, page_df], ignore_index=True)
-
+    time.sleep(5)
 # Display the final DataFrame
 print(final_df)
 

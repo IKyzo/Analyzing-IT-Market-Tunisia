@@ -90,7 +90,7 @@ base_url = "https://www.tunisietravail.net/category/offres-d-emploi-et-recruteme
 
 # Set the range of pages you want to scrape
 start_page = 1
-end_page = 2  # Change this to the desired end page
+end_page = 20  # Change this to the desired end page
 
 # Initialize an empty DataFrame to store the results
 final_df = pd.DataFrame()
