@@ -18,6 +18,7 @@ dashboard, offering users an intuitive way to explore and understand the dynamic
 
 ![image](https://github.com/user-attachments/assets/b7825a43-9ad4-46e1-a839-21edc4060964)
 
-![image](https://github.com/user-attachments/assets/6800bb3c-34f7-4624-8e51-b0d0bb33794b)
+![image](https://github.com/user-attachments/assets/52be4bbc-c106-4bef-937e-01594ca2213e)
+
 
 
